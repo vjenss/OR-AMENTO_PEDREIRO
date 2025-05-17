@@ -19,8 +19,8 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'sua senha secreta aqui')
 app.config['UPLOAD_FOLDER'] = 'static/pdf'
 db = SQLAlchemy(app)
 
-with app.app_context():
-    db.create_all()
+#with app.app_context():
+ #   db.create_all()
 
 # Criar pasta de PDFs se não existir
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
