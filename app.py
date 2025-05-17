@@ -7,18 +7,21 @@ import os
 # Configuração do Flask e SQLAlchemy 
 app = Flask(__name__)
 
-db_url = os.getenv('DATABASE_URL', 'sqlite:///orcamento.db')
+# Use apenas PostgreSQL (exige DATABASE_URL configurada no Render)
+db_url = os.getenv('DATABASE_URL')
+if not db_url:
+    raise RuntimeError("A variável de ambiente DATABASE_URL não está configurada!")
 if db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql://", 1)
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'Elias2025')
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'sua senha secreta aqui')
 app.config['UPLOAD_FOLDER'] = 'static/pdf'
 db = SQLAlchemy(app)
-   
+
 with app.app_context():
     db.create_all()
-    
+
 # Criar pasta de PDFs se não existir
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
