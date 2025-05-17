@@ -12,7 +12,7 @@ if db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql://", 1)
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'sua_chave_secreta_aqui')
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'Elias2025')
 app.config['UPLOAD_FOLDER'] = 'static/pdf'
 db = SQLAlchemy(app)
 
