@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Cadastrar Serviço Padrão</h2>
+    <form method="POST">
+        <div class="mb-3">
+            <label>Descrição:</label>
+            <input type="text" name="descricao" class="form-control" required>
+        </div>
+        <div class="mb-3">
+            <label>Tipo:</label>
+            <select name="tipo" class="form-select">
+                <option value="m2">Por m²</option>
+                <option value="fixo">Valor Fixo</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label>Valor Padrão (R$):</label>
+            <input type="number" name="valor_padrao" class="form-control" step="0.01" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Salvar</button>
+    </form>
+</div>
+{% endblock %}

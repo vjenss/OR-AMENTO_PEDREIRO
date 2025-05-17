@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalhes do Orçamento</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h2, h3 {
+            text-align: center;
+        }
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            padding: 15px;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .table th, .table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .table th {
+            background-color: #f5f5f5;
+        }
+        .text-end {
+            text-align: right;
+        }
+        .table-active {
+            background-color: #f5f5f5;
+        }
+        .compact-table {
+            width: auto;
+            border: none;
+            margin: 0 auto;
+            margin-bottom: 10px;
+        }
+        .compact-table td {
+            padding: 3px 10px 3px 0;
+            border: none;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h2>Detalhes do Orçamento</h2>
+
+    <!-- Dados do Cliente -->
+<div style="margin: 0 auto; width: fit-content; margin-bottom: 10px;">
+    <div><strong>Nome:</strong> {{ orcamento.cliente_nome }}</div>
+    <div><strong>Endereço:</strong> {{ orcamento.cliente_endereco }}</div>
+    <div><strong>Data:</strong> {{ orcamento.data.strftime('%d/%m/%Y') }}</div>
+</div>
+
+    <!-- Lista de Serviços -->
+    <h3>Serviços do Orçamento</h3>
+    <div class="card">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Descrição</th>
+                    <th>Tipo</th>
+                    <th>Valor Unitário</th>
+                    <th>Quantidade</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for servico in orcamento.servicos %}
+                <tr>
+                    <td>{{ servico.descricao }}</td>
+                    <td>{{ 'Por m²' if servico.tipo == 'm2' else 'Fixo' }}</td>
+                    <td>R$ {{ "%.2f"|format(servico.valor) }}</td>
+                    <td>{{ servico.quantidade }}</td>
+                    <td>R$ {{ "%.2f"|format(servico.valor * servico.quantidade) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="4" class="text-end">Subtotal:</th>
+                    <th>R$ {{ "%.2f"|format(orcamento.calcular_total() + orcamento.desconto) }}</th>
+                </tr>
+                <tr>
+                    <th colspan="4" class="text-end">Desconto:</th>
+                    <th>-R$ {{ "%.2f"|format(orcamento.desconto) }}</th>
+                </tr>
+                <tr class="table-active">
+                    <th colspan="4" class="text-end">Total:</th>
+                    <th>R$ {{ "%.2f"|format(orcamento.calcular_total()) }}</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</body>
+</html>

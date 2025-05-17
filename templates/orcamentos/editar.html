@@ -1,0 +1,296 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2 class="my-4">Editar Orçamento #{{ orcamento.id }}</h2>
+    
+    <form method="POST" id="form-editar-orcamento">
+        <!-- Dados do Cliente -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                Dados do Cliente
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Nome:</label>
+                            <input type="text" name="cliente_nome" class="form-control" 
+                                   value="{{ orcamento.cliente_nome }}" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Telefone:</label>
+                            <input type="text" name="cliente_telefone" class="form-control" 
+                                   value="{{ orcamento.cliente_telefone }}">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="mb-3">
+                            <label class="form-label">Endereço:</label>
+                            <input type="text" name="cliente_endereco" class="form-control" 
+                                value="{{ orcamento.cliente_endereco }}">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label class="form-label">Desconto (R$):</label>
+                            <input type="number" name="desconto" class="form-control" 
+                                   step="0.01" value="{{ orcamento.desconto }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Adicionar Serviços -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                Adicionar Serviços
+            </div>
+            <div class="card-body">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-5">
+                        <label class="form-label">Serviço:</label>
+                        <select id="select-servico-padrao" class="form-select">
+                            <option value="">Selecione um serviço pré-cadastrado</option>
+                            {% for servico in servicos_padrao %}
+                            <option value="{{ servico.id }}"
+                                    data-descricao="{{ servico.descricao }}"
+                                    data-tipo="{{ servico.tipo }}"
+                                    data-valor="{{ servico.valor_padrao }}">
+                                {{ servico.descricao }} ({{ 'm²' if servico.tipo == 'm2' else 'Fixo' }}) - R$ {{ "%.2f"|format(servico.valor_padrao) }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" id="btn-adicionar-servico" class="btn btn-primary w-100">
+                            <i class="bi bi-plus-circle"></i> Adicionar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Serviços -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                Serviços do Orçamento
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="tabela-servicos">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Descrição</th>
+                                <th width="100px">Tipo</th>
+                                <th width="120px">Valor Unit.</th>
+                                <th width="100px">Quantidade</th>
+                                <th width="120px">Total</th>
+                                <th width="80px">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for servico in orcamento.servicos %}
+                            <tr data-servico-id="{{ servico.id }}">
+                                <td>
+                                    <input type="text" 
+                                           name="servicos[{{ servico.id }}][descricao]" 
+                                           class="form-control form-control-sm" 
+                                           value="{{ servico.descricao }}" 
+                                           required>
+                                </td>
+                                <td>
+                                    <select name="servicos[{{ servico.id }}][tipo]" 
+                                            class="form-select form-select-sm">
+                                        <option value="m2" {% if servico.tipo == 'm2' %}selected{% endif %}>m²</option>
+                                        <option value="fixo" {% if servico.tipo == 'fixo' %}selected{% endif %}>Fixo</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="number" 
+                                           name="servicos[{{ servico.id }}][valor]" 
+                                           class="form-control form-control-sm valor-unitario" 
+                                           step="0.01" 
+                                           value="{{ servico.valor }}" 
+                                           required>
+                                </td>
+                                <td>
+                                    <input type="number" 
+                                           name="servicos[{{ servico.id }}][quantidade]" 
+                                           class="form-control form-control-sm quantidade" 
+                                           min="1" 
+                                           value="{{ servico.quantidade }}" 
+                                           required>
+                                </td>
+                                <td class="valor-total text-end">
+                                    R$ {{ "%.2f"|format(servico.valor * servico.quantidade) }}
+                                </td>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-danger btn-sm btn-remover-servico">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot class="table-group-divider">
+                            <tr>
+                                <th colspan="4" class="text-end">Subtotal:</th>
+                                <th id="subtotal-servicos" class="text-end">R$ {{ "%.2f"|format(orcamento.calcular_total() + orcamento.desconto) }}</th>
+                                <th></th>
+                            </tr>
+                            <tr>
+                                <th colspan="4" class="text-end">Desconto:</th>
+                                <th id="desconto" class="text-end">-R$ {{ "%.2f"|format(orcamento.desconto) }}</th>
+                                <th></th>
+                            </tr>
+                            <tr class="table-active">
+                                <th colspan="4" class="text-end">Total do Orçamento:</th>
+                                <th id="total-orcamento" class="text-end">R$ {{ "%.2f"|format(orcamento.calcular_total()) }}</th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="d-flex justify-content-between">
+            <a href="{{ url_for('detalhes_orcamento', id=orcamento.id) }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar
+            </a>
+             <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+        </div>
+    </form>
+</div>
+
+<!-- JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tabelaServicos = document.getElementById('tabela-servicos');
+    const btnAdicionar = document.getElementById('btn-adicionar-servico');
+    const selectServico = document.getElementById('select-servico-padrao');
+    const form = document.getElementById('form-editar-orcamento');
+
+    // Adicionar serviço
+    btnAdicionar.addEventListener('click', () => {
+        const option = selectServico.options[selectServico.selectedIndex];
+        if (!option.value) return alert('Selecione um serviço para adicionar!');
+
+        const servicoId = 'new-' + Date.now();
+        tabelaServicos.querySelector('tbody').insertAdjacentHTML('beforeend', `
+            <tr data-servico-id="${servicoId}">
+                <td><input type="text" name="servicos[${servicoId}][descricao]" class="form-control form-control-sm" value="${option.dataset.descricao}" required></td>
+                <td><select name="servicos[${servicoId}][tipo]" class="form-select form-select-sm">
+                        <option value="m2" ${option.dataset.tipo === 'm2' ? 'selected' : ''}>m²</option>
+                        <option value="fixo" ${option.dataset.tipo === 'fixo' ? 'selected' : ''}>Fixo</option>
+                    </select></td>
+                <td><input type="number" name="servicos[${servicoId}][valor]" class="form-control form-control-sm valor-unitario" step="0.01" value="${option.dataset.valor}" required></td>
+                <td><input type="number" name="servicos[${servicoId}][quantidade]" class="form-control form-control-sm quantidade" min="1" value="1" required></td>
+                <td class="valor-total text-end">R$ ${parseFloat(option.dataset.valor).toFixed(2)}</td>
+                <td class="text-center"><button type="button" class="btn btn-danger btn-sm btn-remover-servico"><i class="bi bi-trash"></i></button></td>
+            </tr>
+        `);
+        selectServico.selectedIndex = 0;
+        atualizarTotais();
+    });
+
+    // Remover serviço
+    tabelaServicos.addEventListener('click', (e) => {
+        if (e.target.closest('.btn-remover-servico')) {
+            e.target.closest('tr').remove();
+            atualizarTotais();
+        }
+    });
+
+    // Atualizar totais
+    tabelaServicos.addEventListener('input', (e) => {
+        if (e.target.matches('.valor-unitario, .quantidade')) {
+            const linha = e.target.closest('tr');
+            const valor = parseFloat(linha.querySelector('.valor-unitario').value) || 0;
+            const qtd = parseInt(linha.querySelector('.quantidade').value) || 0;
+            linha.querySelector('.valor-total').textContent = `R$ ${(valor * qtd).toFixed(2)}`;
+            atualizarTotais();
+        }
+    });
+
+    function atualizarTotais() {
+        let subtotal = [...tabelaServicos.querySelectorAll('tbody tr')].reduce((acc, linha) => {
+            const valor = parseFloat(linha.querySelector('.valor-unitario').value) || 0;
+            const qtd = parseInt(linha.querySelector('.quantidade').value) || 0;
+            return acc + valor * qtd;
+        }, 0);
+
+        const desconto = parseFloat(form.desconto.value) || 0;
+        document.getElementById('subtotal-servicos').textContent = `R$ ${subtotal.toFixed(2)}`;
+        document.getElementById('desconto').textContent = `-R$ ${desconto.toFixed(2)}`;
+        document.getElementById('total-orcamento').textContent = `R$ ${(subtotal - desconto).toFixed(2)}`;
+    }
+
+    // Enviar formulário via AJAX
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btnSalvar = e.submitter;
+        btnSalvar.disabled = true;
+        btnSalvar.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Salvando...';
+
+        try {
+            const formData = new FormData(form);
+            [...tabelaServicos.querySelectorAll('tbody tr')].forEach(linha => {
+                const id = linha.dataset.servicoId;
+                ['descricao', 'tipo', 'valor', 'quantidade'].forEach(campo => {
+                    const input = linha.querySelector(`[name$="[${campo}]"]`);
+                    if (input) formData.append(`servicos[${id}][${campo}]`, input.value);
+                });
+            });
+
+            const response = await fetch(window.location.href, { method: 'POST', body: formData });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Erro desconhecido');
+            }
+
+            const data = await response.json();
+            if (data.success) {
+                window.location.href = data.redirect;
+            } else {
+                alert(`Erro ao salvar: ${data.error || 'Erro desconhecido'}`);
+            }
+        } catch (error) {
+            alert(`Erro ao salvar: ${error.message}`);
+            console.error(error);
+        } finally {
+            btnSalvar.disabled = false;
+            btnSalvar.innerHTML = '<i class="bi bi-save"></i> Salvar Alterações';
+        }
+    });
+});
+</script>
+
+<style>
+    #tabela-servicos th {
+        white-space: nowrap;
+    }
+    .valor-total, #subtotal-servicos, #desconto, #total-orcamento {
+        font-weight: bold;
+    }
+    .btn-remover-servico {
+        transition: transform 0.2s;
+    }
+    .btn-remover-servico:hover {
+        transform: scale(1.1);
+    }
+    .form-control-sm, .form-select-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+</style>
+{% endblock %}

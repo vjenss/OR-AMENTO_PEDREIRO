@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h3>Editar Serviço</h3>
+    <form method="POST">
+        <div class="mb-3">
+            <label>Descrição:</label>
+            <input type="text" name="descricao" class="form-control" value="{{ servico.descricao }}" required>
+        </div>
+        <div class="mb-3">
+            <label>Tipo:</label>
+            <select name="tipo" class="form-select">
+                <option value="m2" {% if servico.tipo == 'm2' %}selected{% endif %}>m²</option>
+                <option value="fixo" {% if servico.tipo == 'fixo' %}selected{% endif %}>Fixo</option>
+            </select>
+        </div>
+        {% if servico.valor is defined %}
+        <div class="mb-3">
+            <label>Valor:</label>
+            <input type="number" name="valor" class="form-control" step="0.01" value="{{ servico.valor }}" required>
+        </div>
+        {% endif %}
+        {% if servico.valor_padrao is defined %}
+        <div class="mb-3">
+            <label>Valor Padrão:</label>
+            <input type="number" name="valor_padrao" class="form-control" step="0.01" value="{{ servico.valor_padrao }}" required>
+        </div>
+        {% endif %}
+        {% if servico.quantidade is defined %}
+        <div class="mb-3">
+            <label>Quantidade:</label>
+            <input type="number" name="quantidade" class="form-control" value="{{ servico.quantidade }}" required>
+        </div>
+        {% endif %}
+        <button type="submit" class="btn btn-primary">Salvar</button>
+        {% if servico.orcamento_id is defined and servico.orcamento_id %}
+            <a href="{{ url_for('editar_orcamento', id=servico.orcamento_id) }}" class="btn btn-secondary">Cancelar</a>
+        {% else %}
+            <a href="{{ url_for('lista_servicos_padrao') }}" class="btn btn-secondary">Cancelar</a>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}

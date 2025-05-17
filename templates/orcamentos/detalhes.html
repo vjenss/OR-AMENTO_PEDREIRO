@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2 class="my-4">Detalhes do Orçamento</h2>
+
+    <!-- Dados do Cliente -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            Dados do Cliente
+        </div>
+        <div class="card-body">
+            <p><strong>Nome:</strong> {{ orcamento.cliente_nome }}</p>
+            <p><strong>Telefone:</strong> {{ orcamento.cliente_telefone }}</p>
+            <p><strong>Endereço:</strong> {{ orcamento.cliente_endereco }}</p>
+            <p><strong>Data:</strong> {{ orcamento.data.strftime('%d/%m/%Y') }}</p>
+        </div>
+    </div>
+
+    <!-- Lista de Serviços -->
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            Serviços do Orçamento
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Descrição</th>
+                            <th>Tipo</th>
+                            <th>Valor Unitário</th>
+                            <th>Quantidade</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for servico in orcamento.servicos %}
+                        <tr>
+                            <td>{{ servico.descricao }}</td>
+                            <td>{{ 'Por m²' if servico.tipo == 'm2' else 'Fixo' }}</td>
+                            <td>R$ {{ "%.2f"|format(servico.valor) }}</td>
+                            <td>{{ servico.quantidade }}</td>
+                            <td>R$ {{ "%.2f"|format(servico.valor * servico.quantidade) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="4" class="text-end">Subtotal:</th>
+                            <th>R$ {{ "%.2f"|format(orcamento.calcular_total() + orcamento.desconto) }}</th>
+                        </tr>
+                        <tr>
+                            <th colspan="4" class="text-end">Desconto:</th>
+                            <th>-R$ {{ "%.2f"|format(orcamento.desconto) }}</th>
+                        </tr>
+                        <tr class="table-active">
+                            <th colspan="4" class="text-end">Total:</th>
+                            <th>R$ {{ "%.2f"|format(orcamento.calcular_total()) }}</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botões de Ação -->
+    <div class="d-flex justify-content-between">
+        <a href="{{ url_for('lista_orcamentos') }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+        <a href="{{ url_for('editar_orcamento', id=orcamento.id) }}" class="btn btn-primary">
+            <i class="bi bi-pencil"></i> Editar
+        </a>
+        <a href="{{ url_for('gerar_pdf', id=orcamento.id) }}" class="btn btn-success">
+            <i class="bi bi-file-earmark-pdf"></i> Gerar PDF
+        </a>
+    </div>
+</div>
+
+<style>
+    .table th {
+        white-space: nowrap;
+    }
+    .table td, .table th {
+        vertical-align: middle;
+    }
+    .table tfoot th {
+        font-weight: bold;
+    }
+</style>
+{% endblock %}

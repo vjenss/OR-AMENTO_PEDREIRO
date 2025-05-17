@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2 class="my-4">Recebimentos</h2>
+    
+    <!-- Botão para Adicionar -->
+    <a href="{{ url_for('adicionar_recebimento') }}" class="btn btn-success mb-3">+ Novo Recebimento</a>
+
+    <!-- Tabela de Recebimentos -->
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Valor (R$)</th>
+                    <th>Data</th>
+                    <th>Orçamento Vinculado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for recebimento in recebimentos %}
+                <tr>
+                    <td>{{ recebimento.cliente_nome }}</td>
+                    <td>{{ "%.2f"|format(recebimento.valor) }}</td>
+                    <td>{{ recebimento.data.strftime('%d/%m/%Y') }}</td>
+                    <td>
+                        {% if recebimento.orcamento_id %}
+                            <a href="{{ url_for('detalhes_orcamento', id=recebimento.orcamento_id) }}" class="btn btn-sm btn-info">
+                                Ver Orçamento #{{ recebimento.orcamento_id }}
+                            </a>
+                        {% else %}
+                            <span class="text-muted">Nenhum</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="text-center">Nenhum recebimento registrado.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Total Recebido -->
+    <div class="alert alert-primary mt-3">
+        <strong>Total Recebido:</strong> R$ {{ "%.2f"|format(recebimentos|sum(attribute='valor')) }}
+    </div>
+</div>
+{% endblock %}

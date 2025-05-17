@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2 class="my-4">Todos os Orçamentos</h2>
+    
+    <!-- Tabela de Orçamentos -->
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Telefone</th>
+                    <th>Endereço</th>
+                    <th>Data</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for orcamento in orcamentos %}
+                <tr>
+                    <td>{{ orcamento.cliente_nome }}</td>
+                    <td>{{ orcamento.cliente_telefone }}</td>
+                    <td>{{ orcamento.cliente_endereco }}</td>
+                    <td>{{ orcamento.data.strftime('%d/%m/%Y') }}</td>
+                    <td>
+                        <a href="{{ url_for('detalhes_orcamento', id=orcamento.id) }}" class="btn btn-sm btn-info">Detalhes</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center">Nenhum orçamento encontrado.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Botão para Novo Orçamento -->
+    <a href="{{ url_for('criar_orcamento') }}" class="btn btn-success mt-3">+ Novo Orçamento</a>
+</div>
+{% endblock %}

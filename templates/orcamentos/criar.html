@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2 class="my-4">Novo Orçamento</h2>
+    
+    <form method="POST">
+        <!-- Dados do Cliente -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                Dados do Cliente
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Nome:</label>
+                    <input type="text" name="cliente_nome" class="form-control" value="{{ cliente_nome }}" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Telefone:</label>
+                    <input type="text" name="cliente_telefone" class="form-control" value="{{ cliente_telefone }}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Endereço:</label>
+                    <input type="text" name="cliente_endereco" class="form-control" value="{{ cliente_endereco }}">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Desconto (R$):</label>
+                    <input type="number" name="desconto" class="form-control" step="0.01" value="{{ desconto }}">
+                </div>
+            </div>
+        </div>
+
+        <!-- Serviços Pré-Cadastrados -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                Serviços Pré-Cadastrados
+            </div>
+            <div class="card-body">
+                {% for servico in servicos_padrao %}
+                <div class="mb-3">
+                    <label>{{ servico.descricao }} ({{ servico.tipo }}): R$ {{ servico.valor_padrao }}</label>
+                    <input type="number" name="servico_padrao_{{ servico.id }}_quantidade" class="form-control" placeholder="Quantidade">
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Serviços Manuais -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                Serviços Manuais
+            </div>
+            <div class="card-body">
+                {% for i in range(1, num_servicos + 1) %}
+                <div class="mb-3 border p-3">
+                    <h5>Serviço {{ i }}</h5>
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <label class="form-label">Descrição:</label>
+                            <input type="text" name="servico{{ i }}_descricao" class="form-control">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Tipo:</label>
+                            <select name="servico{{ i }}_tipo" class="form-select">
+                                <option value="m2">Por m²</option>
+                                <option value="fixo">Valor Fixo</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Valor (R$):</label>
+                            <input type="number" name="servico{{ i }}_valor" class="form-control" step="0.01">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Quantidade:</label>
+                            <input type="number" name="servico{{ i }}_quantidade" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Botão para adicionar mais serviços -->
+        <button type="submit" name="adicionar_servico" value="1" class="btn btn-secondary">+ Adicionar Serviço</button>
+
+        <!-- Materiais -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                Materiais
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Descrição:</label>
+                    <input type="text" name="material1_descricao" class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Salvar Orçamento</button>
+    </form>
+</div>
+{% endblock %}

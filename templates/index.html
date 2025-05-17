@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2 class="mb-4">Orçamentos Recentes</h2>
+    
+    <!-- Cartões de Orçamentos -->
+    <div class="row">
+        {% for orcamento in orcamentos %}
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ orcamento.cliente_nome }}</h5>
+                    <p class="card-text">
+                        <strong>Telefone:</strong> {{ orcamento.cliente_telefone }}<br>
+                        <strong>Endereço:</strong> {{ orcamento.cliente_endereco }}<br>
+                        <strong>Data:</strong> {{ orcamento.data.strftime('%d/%m/%Y') }}
+                    </p>
+                    <a href="{{ url_for('detalhes_orcamento', id=orcamento.id) }}" class="btn btn-primary btn-sm">Detalhes</a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">Nenhum orçamento cadastrado ainda.</div>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}
