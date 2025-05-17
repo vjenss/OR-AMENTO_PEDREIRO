@@ -15,7 +15,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'Elias2025')
 app.config['UPLOAD_FOLDER'] = 'static/pdf'
 db = SQLAlchemy(app)
-
+   
+with app.app_context():
+    db.create_all()
+    
 # Criar pasta de PDFs se não existir
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
@@ -336,6 +339,4 @@ def remover_servico_ajax(id, servico_id):
 
 # --- Inicialização ---
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
     app.run(debug=False)
