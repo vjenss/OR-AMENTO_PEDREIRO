@@ -64,6 +64,22 @@
         </div>
     </div>
 
+    <!-- Lista de Materiais -->
+    <div class="card mb-4">
+        <div class="card-header bg-warning text-white">
+            Materiais do Orçamento
+        </div>
+        <div class="card-body">
+            <ul>
+            {% for material in orcamento.materiais %}
+                <li>{{ material.descricao }}</li>
+            {% else %}
+                <li>Nenhum material cadastrado.</li>
+            {% endfor %}
+            </ul>
+        </div>
+    </div>
+
     <!-- Botões de Ação -->
     <div class="d-flex justify-content-between">
         <a href="{{ url_for('lista_orcamentos') }}" class="btn btn-secondary">

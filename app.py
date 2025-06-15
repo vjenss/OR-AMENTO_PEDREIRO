@@ -193,6 +193,17 @@ def criar_orcamento():
                 )
                 db.session.add(novo_servico)
 
+        # Salvar materiais
+        material_descricao = request.form.get('material1_descricao')
+        if material_descricao:
+            novo_material = Material(
+                descricao=material_descricao,
+                quantidade='',  # ou algum valor padrão, se não tiver campo de quantidade
+                orcamento_id=novo_orcamento.id
+            )
+            db.session.add(novo_material)
+            db.session.commit()
+
         db.session.commit()
         flash('Orçamento criado com sucesso!', 'success')
         return redirect(url_for('lista_orcamentos'))
