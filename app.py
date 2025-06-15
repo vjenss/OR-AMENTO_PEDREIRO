@@ -243,6 +243,16 @@ def editar_orcamento(id):
                             orcamento_id=orcamento.id
                         )
                         db.session.add(novo_servico)
+            # Atualizar os materiais
+            orcamento.materiais.clear()
+            material_descricao = request.form.get('material1_descricao')
+            if material_descricao:
+                novo_material = Material(
+                    descricao=material_descricao,
+                    quantidade='',  # ou algum valor padrão, se não tiver campo de quantidade
+                    orcamento_id=orcamento.id
+                )
+                db.session.add(novo_material)
 
             db.session.commit()
             return jsonify({'success': True, 'redirect': url_for('detalhes_orcamento', id=id)})

@@ -99,5 +99,15 @@
             </tfoot>
         </table>
     </div>
+
+    <!-- Materiais -->
+    <h3>Materiais</h3>
+    <ul>
+    {% for material in orcamento.materiais %}
+        <li>{{ material.descricao }}</li>
+    {% else %}
+        <li>Nenhum material cadastrado.</li>
+    {% endfor %}
+    </ul>
 </body>
 </html>

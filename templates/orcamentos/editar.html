@@ -162,6 +162,13 @@
             </div>
         </div>
 
+        <!-- Exemplo para um material -->
+        <div class="mb-3">
+            <label class="form-label">Descrição do Material:</label>
+            <input type="text" name="material1_descricao" class="form-control"
+                   value="{{ orcamento.materiais[0].descricao if orcamento.materiais else '' }}">
+        </div>
+
         <!-- Botões de Ação -->
         <div class="d-flex justify-content-between">
             <a href="{{ url_for('detalhes_orcamento', id=orcamento.id) }}" class="btn btn-secondary">
